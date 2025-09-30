@@ -1,0 +1,28 @@
+You are working to create an trading automation backend using Rust, primary foucs is to create the POST Apis for receving the signals, and check if they match all the conditions for any given pair. so you should track the conditions update the conditions and verify the conditions separately for each pair.
+
+
+# Conditions
+# 1. Sessions Sweep
+ > You will recieve "sessions_sweep, pair, timeframe, candle_time, direction, previous_session High, previous_session Low"
+# 2. Fair Value gaps touched,
+   > You will recieve "fvg, pair, timeframe, candle_time, fvg_direction, gap_high, gap_low"
+# 3. Absorption / Exhuastion candle
+   > You will recieve "absorption, pair, timeframe, candle_time, direction, candle_close"
+# 4. CVD Divergence
+   > You will recieve "cvd, pair, timeframe, candle_time, direction"
+
+
+So, when you recive the first condition everything will reset and we will start looking for rest of conditions, once we have all the conditions met we will trigger a trade signal. make sure the cvd condition will only satisfy If absorption or Exhuastion is already there. 
+
+it is possible to receive multiple alerts in case of condition 1, 2, 3 so, make sure you reset the conition 1,2,3 on trade alert is being sent. 
+If you recieve alert and conition is already met just ignore it.
+
+
+# Trade Signal
+   > You will send "trade_signal, pair, timeframe, candle_time, direction, "
+
+# Make sure you follow the requirements and create the right and simple approach for tracking / updating the conditions for each pair.
+
+# Make sure to follow the correct syntax for rust and tokio
+
+
