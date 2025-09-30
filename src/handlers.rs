@@ -13,7 +13,7 @@ pub async fn handle_signal(
     Json(signal): Json<SignalRequest>
 ) -> impl IntoResponse {
     // Get a unique key for this pair and timeframe
-    let key = format!("{}_{}", signal.pair, signal.timeframe);
+    let key = format!("{}_{}_{}_{}", signal.pair, signal.timeframe, signal.candle_close.unwrap_or(0.0), signal.direction.unwrap()_or("none".to_string()));
     
     // Get or create a state for this pair
     let mut pair_states = state.pair_states.lock().unwrap();
