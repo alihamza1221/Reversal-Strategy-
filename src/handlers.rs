@@ -13,14 +13,14 @@ pub async fn handle_signal(
     Json(signal): Json<SignalRequest>
 ) -> impl IntoResponse {
     // Get a unique key for this pair and timeframe
-    let key = format!("{}_{}_{}", signal.pair, signal.timeframe, signal.candle_time);
+    let key = format!("{}_{}", signal.pair, signal.timeframe);
 
     match &signal.candle_close {
         Some(candle_close) => {
-            println!("Received signal: {:?}, Candle Close: {}", signal, candle_close);
+            println!("Received signal Candle Close: {}", candle_close);
         },
         None => {
-            println!("signal: {:?},", signal);
+            println!("");
         }
     }
 
@@ -33,7 +33,7 @@ pub async fn handle_signal(
     
     // Update candle time
     pair_state.last_candle_time = Some(signal.candle_time.clone());
-    println!("Current pair state for {}: {:?}", key, pair_state);    // Process signal based on type
+    println!("Current pair state {:?}", pair_state);    // Process signal based on type
     match signal.signal_type.as_str() {
         "sessions_sweep" => {
             // Sessions sweep resets all conditions
