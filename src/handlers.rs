@@ -14,6 +14,16 @@ pub async fn handle_signal(
 ) -> impl IntoResponse {
     // Get a unique key for this pair and timeframe
     let key = format!("{}_{}_{}", signal.pair, signal.timeframe, signal.candle_time);
+
+    match &signal.candle_close {
+        Some(candle_close) => {
+            println!("Received signal: {:?}, Candle Close: {}", signal, candle_close);
+        },
+        None => {
+            println!("signal: {:?},", signal);
+        }
+    }
+
     
     // Get or create a state for this pair
     let mut pair_states = state.pair_states.lock().unwrap();
@@ -23,7 +33,7 @@ pub async fn handle_signal(
     
     // Update candle time
     pair_state.last_candle_time = Some(signal.candle_time.clone());
-    
+    println!("Current pair state: {:?}", pair_state);
     // Process signal based on type
     match signal.signal_type.as_str() {
         "sessions_sweep" => {
@@ -57,7 +67,18 @@ pub async fn handle_signal(
         "cvd" => {
             // CVD condition is only considered if absorption is already met
             if pair_state.absorption_met && !pair_state.cvd_met {
+
                 if let Some(direction) = signal.direction {
+                    match &pair_state.sessions_sweep_direction {
+                        Some(s)=> {
+                            if s == &direction {
+                                println!("CVD direction should be opposite {}, ignoring", key);
+                                return (StatusCode::OK, "Signal processed").into_response();
+                            }
+                        },
+                        _ => {}
+                        
+                    }
                     pair_state.cvd_met = true;
                     pair_state.cvd_direction = Some(direction);
                     println!("CVD condition met for {}", key);

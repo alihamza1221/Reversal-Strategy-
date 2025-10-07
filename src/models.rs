@@ -76,15 +76,19 @@ impl PairState {
         self.fvg_direction = None;
         self.absorption_met = false;
         self.absorption_direction = None;
-        self.signals_sent_since_session = 0; // Reset signal counter on new session
+        self.signals_sent_since_session = 0; 
+        self.cvd_direction = None;
+        self.cvd_met = false;
+        // Reset signal counter on new session
     }
 
     pub fn reset_after_trade(&mut self) {
-        self.sessions_sweep_met = false;
-        self.fvg_met = false;
-        self.absorption_met = false;
-        // Note: We don't reset CVD condition after trade
+        //self.sessions_sweep_met = false;
+        //self.fvg_met = false;
+        //self.absorption_met = false;
+        self.cvd_met = false;
     }
+
 
     pub fn are_all_conditions_met(&self) -> bool {
         self.sessions_sweep_met && 
@@ -95,12 +99,9 @@ impl PairState {
         self.direction_check()
     }
 
-    // Check if all directions match
     pub fn direction_check(&self) -> bool {
-        match (&self.sessions_sweep_direction, &self.fvg_direction, &self.absorption_direction, &self.cvd_direction) {
-            (Some(s), Some(f), Some(a), Some(c)) => {
-                s == c && a == c && *f != *c // FVG direction is opposite to trade direction
-            },
+        match (&self.sessions_sweep_direction, &self.cvd_direction) {
+            (Some(s), Some(c)) => s != c, // Sessions sweep direction should be opposite to CVD direction
             _ => false,
         }
     }
