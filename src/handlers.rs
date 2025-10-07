@@ -46,26 +46,25 @@ pub async fn handle_signal(
             }
         },
         "fvg" => {
-            if !pair_state.fvg_met {
-                if let Some(fvg_direction) = signal.fvg_direction {
-                    pair_state.fvg_met = true;
-                    pair_state.fvg_direction = Some(fvg_direction);
-                    println!("FVG condition met for {}", key);
-                }
+            
+            if let Some(fvg_direction) = signal.fvg_direction {
+                pair_state.fvg_met = true;
+                pair_state.fvg_direction = Some(fvg_direction);
+                println!("FVG condition met for {}", key);
             }
+            
         },
         "absorption" => {
-            if !pair_state.absorption_met {
-                if let Some(direction) = signal.direction {
-                    pair_state.absorption_met = true;
-                    pair_state.absorption_direction = Some(direction);
-                    println!("Absorption condition met for {}", key);
-                }
+            if let Some(direction) = signal.direction {
+                pair_state.absorption_met = true;
+                pair_state.absorption_direction = Some(direction);
+                println!("Absorption condition met for {}", key);
             }
+            
         },
         "cvd" => {
             // CVD condition is only considered if absorption is already met
-            if pair_state.absorption_met && !pair_state.cvd_met {
+            if pair_state.absorption_met  {
 
                 if let Some(direction) = signal.direction {
                     match &pair_state.sessions_sweep_direction {
@@ -130,8 +129,8 @@ pub async fn handle_signal(
             Json(trade_signal)
         ).into_response();
     }
-    
-    (StatusCode::OK, "Signal processed").into_response()
+
+    (StatusCode::OK, "Signal processed successfully").into_response()
 }
 
 async fn send_telegram_alert(bot_token: &str, chat_id: &str, signal: &TradeSignal) {
