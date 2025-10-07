@@ -1,8 +1,10 @@
 use std::sync::{Arc, Mutex};
 use std::collections::HashMap;
 use axum::{
-    routing::{post},
+    routing::{post, get},
     Router, 
+    http::StatusCode,
+
 };
 
 mod models;
@@ -18,8 +20,14 @@ struct AppState {
     telegram_chat_id: String,
 }
 
+async fn health_check() -> (StatusCode, &'static str) {
+    (StatusCode::OK, "Server is running....")
+}
+
+
 #[tokio::main]
 async fn main() {
+    dotenv::dotenv().ok();
     // Initialize app state with empty hashmap for tracking pair conditions
     let app_state: AppState = AppState {
         pair_states: Arc::new(Mutex::new(HashMap::new())),
@@ -30,11 +38,16 @@ async fn main() {
     // Create router with routes
     let app = Router::new()
         .route("/signal", post(handle_signal))
+        .route("/health", get(health_check))
+        .route("/", get(health_check))
         .with_state(app_state);
 
     // Start server
-    let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
-    println!("Server listening on http://0.0.0.0:3000");
+    let port = std::env::var("PORT").unwrap_or_else(|_| "3000".to_string());
+
+    let listener = tokio::net::TcpListener::bind(format!("0.0.0.0:{}", port)).await.unwrap();
+
+    println!("Server listening on http://0.0.0.0:{}", port);
     axum::serve(listener, app).await.unwrap();
 }
 
