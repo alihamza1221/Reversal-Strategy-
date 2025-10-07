@@ -33,8 +33,7 @@ pub async fn handle_signal(
     
     // Update candle time
     pair_state.last_candle_time = Some(signal.candle_time.clone());
-    println!("Current pair state: {:?}", pair_state);
-    // Process signal based on type
+    println!("Current pair state for {}: {:?}", key, pair_state);    // Process signal based on type
     match signal.signal_type.as_str() {
         "sessions_sweep" => {
             // Sessions sweep resets all conditions
